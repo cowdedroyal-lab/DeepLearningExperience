@@ -1,0 +1,33 @@
+# CNN-Transformer 图像描述实验基础配置
+
+seed: 42
+
+data:
+ root: data/coco
+ images:
+  train_dir: train2014
+  val_dir: val2014
+ annotations:
+  dir: annotations
+  train_file: captions_train2014.json
+  val_file: captions_val2014.json
+ # 从 val2014 划分验证集和测试集的比例
+ val_split: 0.8   # 80% 作为验证集
+ test_split: 0.2  # 20% 作为测试集
+ # 若需要快速调试，可限制每个 split 的最大样本数（null 表示不限制）
+ max_train_samples: null
+ max_val_samples: null
+ max_test_samples: null
+
+tokenizer:
+ name: bert-base-uncased
+ do_lower_case: true
+#  type: word
+#  min_freq: 5
+#  max_len: 50
+
+transforms:
+ resize: [224, 224]
+ imagenet_normalize: true
+
+paths_resolved: false  # 内部标记位，勿改

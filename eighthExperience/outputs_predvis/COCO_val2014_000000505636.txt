@@ -1,0 +1,11 @@
+image_id: 505636
+file_name: COCO_val2014_000000505636.jpg
+caption: a person jumping in the air on a snowboard.
+metrics:
+  BLEU-1: 0.888889
+  BLEU-2: 0.816497
+  BLEU-3: 0.658634
+  BLEU-4: 0.555524
+  CIDEr: 0.000000
+  METEOR: 0.750000
+  ROUGE-L: 0.777778

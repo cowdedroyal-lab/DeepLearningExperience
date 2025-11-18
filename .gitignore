@@ -1,0 +1,18 @@
+.vscode
+**/.vscode
+
+# 忽略 数据集文件
+**/data
+**/datasets
+**/sample-submission-version
+**/CamVid
+**/pred_vis
+
+*.zip
+*.pt
+*.pth
+*.tar.gz
+*.npz
+
+__pycache__
+

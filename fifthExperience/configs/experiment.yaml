@@ -1,0 +1,14 @@
+# 训练实验配置（供 fifthExperience/train.py 读取）
+# 大多与 yolov5/train.py 的命令行参数一一对应
+
+data: configs/dataset.yaml
+weights: yolov5s.pt          # 预训练权重，首次训练建议用官方 release 的 .pt
+imgsz: 640
+epochs: 100
+batch: 16
+device: 0                    # -1 为 CPU，"0,1" 多卡
+project: runs/train
+name: custom_yolov5s
+rect: true                   # 采用矩形训练以提高样本利用率
+workers: 8
+hyp: null                    # 可指定自定义超参 yaml，如 yolov5/data/hyps/hyp.scratch-high.yaml

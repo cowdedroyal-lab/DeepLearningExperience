@@ -1,0 +1,19 @@
+# Eighth Experience dependencies
+# Core
+torch
+torchvision
+Pillow
+numpy
+pyyaml
+termcolor
+matplotlib
+
+tqdm
+transformers
+
+# COCO + Evaluation
+pycocotools>=2.0.2
+pycocoevalcap>=1.2
+
+# TensorBoard
+tensorboard

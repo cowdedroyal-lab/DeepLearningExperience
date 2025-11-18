@@ -1,0 +1,35 @@
+experiment_name: segnet_camvid11
+seed: 42
+num_classes: 11
+ignore_index: 255
+class_mode: camvid_11  # 使用 11 类；配合 CamVidGray 索引标签无需颜色映射
+# class_colors_path:  # 使用 CamVidGray（灰度索引）时不需要
+train_images_dir: CamVid/converted/camvid11/train/images
+train_labels_dir: CamVid/converted/camvid11/train/labels
+val_images_dir: CamVid/converted/camvid11/val/images
+val_labels_dir: CamVid/converted/camvid11/val/labels
+test_images_dir: CamVid/converted/camvid11/test/images
+test_labels_dir: CamVid/converted/camvid11/test/labels
+input_height: 352
+input_width: 480
+batch_size: 32
+epochs: 120
+optimizer: adam
+lr: 1e-3
+weight_decay: 1e-4
+lr_scheduler: cosine
+warmup_epochs: 5
+save_dir: ./outputs
+log_interval: 50
+val_interval: 1
+amp: true
+num_workers: 4
+# 根据 compute_class_weights.py (median_freq, mean-normalized) 生成的类别权重
+# 若需切换为其它方法请重新运行脚本并替换
+# class_weights: [0.079372, 0.057077, 1.35553, 0.042897, 0.277575, 0.137763, 1.142552, 1.189002, 0.213544, 1.903763, 4.600925]
+
+# SegNet 模型相关配置
+model:
+  variant: vgg16_bn        # vgg16_bn 或 vanilla
+  pretrained: true         # 是否加载 ImageNet 预训练编码器
+  freeze_encoder_bn: true  # 冻结 BN，有利于小数据集稳定训练

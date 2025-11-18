@@ -1,0 +1,11 @@
+image_id: 291680
+file_name: COCO_val2014_000000291680.jpg
+caption: a baseball player swinging a bat at a ball
+metrics:
+  BLEU-1: 0.888889
+  BLEU-2: 0.745356
+  BLEU-3: 0.682176
+  BLEU-4: 0.631197
+  CIDEr: 0.000000
+  METEOR: 0.666667
+  ROUGE-L: 0.666667

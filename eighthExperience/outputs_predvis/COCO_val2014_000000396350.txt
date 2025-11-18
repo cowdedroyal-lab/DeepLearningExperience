@@ -1,0 +1,11 @@
+image_id: 396350
+file_name: COCO_val2014_000000396350.jpg
+caption: a bus is driving down the street in front of a bus.
+metrics:
+  BLEU-1: 0.750000
+  BLEU-2: 0.639602
+  BLEU-3: 0.589201
+  BLEU-4: 0.549100
+  CIDEr: 0.000000
+  METEOR: 0.700000
+  ROUGE-L: 0.608696

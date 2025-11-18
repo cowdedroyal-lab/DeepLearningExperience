@@ -1,0 +1,33 @@
+experiment_name: segnet_camvid
+seed: 42
+num_classes: 31
+ignore_index: 255
+class_mode: camvid_32  # camvid_32 支持 32 类（建议将 Void 映射为 ignore，不计入 num_classes）
+class_colors_path: ./configs/camvid_32_colors.json
+train_images_dir: CamVid/converted/camvid32/train/images
+train_labels_dir: CamVid/converted/camvid32/train/labels
+val_images_dir: CamVid/converted/camvid32/val/images
+val_labels_dir: CamVid/converted/camvid32/val/labels
+test_images_dir: CamVid/converted/camvid32/test/images
+test_labels_dir: CamVid/converted/camvid32/test/labels
+input_height: 352
+input_width: 480
+batch_size: 32
+epochs: 120
+optimizer: adam
+lr: 1e-3
+weight_decay: 1e-4
+lr_scheduler: cosine
+warmup_epochs: 5
+save_dir: ./outputs
+log_interval: 50
+val_interval: 1
+amp: true
+num_workers: 4
+# class_weight: [0.2663247265417075, 0.192886085558474, 4.564192771179513, 0.14170951861003145, 0.9999999999785899, 0.4613580027852376, 3.824763832617499, 3.981395055601395, 0.7648330845222602, 7.018229583167839, 15.381581574351385]
+
+# SegNet 模型相关配置
+model:
+ variant: vgg16_bn        # vgg16_bn 或 vanilla
+ pretrained: true         # 是否加载 ImageNet 预训练编码器
+ freeze_encoder_bn: true  # 冻结 BN，有利于小数据集稳定训练

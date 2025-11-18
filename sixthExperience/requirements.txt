@@ -1,0 +1,7 @@
+tqdm
+numpy==1.26.4
+Pillow
+opencv-python
+tensorboard
+pyyaml
+matplotlib

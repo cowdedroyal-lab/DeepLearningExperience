@@ -1,0 +1,4 @@
+# Minimal deps for training PTB LSTM LM
+# PyTorch version should match your CUDA. CPU-only is also fine.
+torch>=1.12
+numpy

@@ -1,0 +1,18 @@
+{
+  "loss_path": "/data/wtw/Desktop/fourthExperience/figures/training_loss.png",
+  "bleu_path": "/data/wtw/Desktop/fourthExperience/figures/dev_bleu.png",
+  "lr_path": "/data/wtw/Desktop/fourthExperience/figures/learning_rate.png",
+  "bleu_time_path": "/data/wtw/Desktop/fourthExperience/figures/bleu_vs_time.png",
+  "best_bleu": 23.498642774763134,
+  "best_step": 22950,
+  "best_epoch": 30,
+  "tb_plots": {
+    "train/loss": "/data/wtw/Desktop/fourthExperience/figures/tb_train_loss.png",
+    "train/lr": "/data/wtw/Desktop/fourthExperience/figures/tb_train_lr.png",
+    "dev/loss": "/data/wtw/Desktop/fourthExperience/figures/tb_dev_loss.png",
+    "dev/bleu": "/data/wtw/Desktop/fourthExperience/figures/tb_dev_bleu.png",
+    "epoch/train_loss": "/data/wtw/Desktop/fourthExperience/figures/tb_epoch_train_loss.png",
+    "epoch/dev_loss": "/data/wtw/Desktop/fourthExperience/figures/tb_epoch_dev_loss.png",
+    "epoch/dev_bleu": "/data/wtw/Desktop/fourthExperience/figures/tb_epoch_dev_bleu.png"
+  }
+}
