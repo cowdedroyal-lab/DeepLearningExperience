@@ -1,0 +1,188 @@
+# 这个项目的证据化清单：每项内容都指向仓库里的证据。校验：profile-atlas check .
+schema: portfolio/project@1
+id: deeplearning-experience
+title: 深度学习课程实验合集
+title_en: Deep learning course experiments
+kind: course
+role: solo
+status: done
+period: {start: "2025-10", end: "2025-11"}
+visibility: hidden
+
+summary: 国科大深度学习课程 8 次实验：分类、检测、分割、翻译、生成
+problem: >-
+  课程要求在 8 个典型任务（图像分类、语言建模、机器翻译、目标检测、语义分割、图像描述）上各走通一遍训练、评估与可视化。
+  这个仓库把每次实验的代码、日志、曲线和报告收在一起。
+
+techs:
+  - slug: vision-transformer
+    depth: used
+    note: 实验二 CIFAR-10
+  - slug: transformer
+    depth: used
+    note: 实验四翻译、实验八描述解码器
+  - slug: convolutional-neural-network
+    depth: used
+    note: 实验一 MNIST，实验八 ResNet50 编码器
+    proposed: {name: Convolutional Neural Network, name_zh: 卷积神经网络, kind: model}
+  - slug: lstm-language-model
+    depth: used
+    note: 实验三唐诗、实验七 PTB
+    proposed: {name: LSTM Language Model, name_zh: LSTM 语言模型, kind: model}
+  - slug: neural-machine-translation
+    depth: used
+    note: 实验四中译英
+    proposed: {name: Neural Machine Translation, name_zh: 神经机器翻译, kind: application}
+  - slug: yolov5
+    depth: touched
+    note: 实验五，基于官方实现
+    proposed: {name: YOLOv5, name_zh: YOLOv5 目标检测, kind: model}
+  - slug: segnet
+    depth: used
+    note: 实验六 CamVid
+    proposed: {name: SegNet, name_zh: SegNet 语义分割, kind: model}
+  - slug: image-captioning
+    depth: used
+    note: 实验八 COCO
+    proposed: {name: Image Captioning, name_zh: 图像描述, kind: application}
+
+contributions:
+  - what: 用 SegNet 在 CamVid 上做 11 类和 32 类语义分割，解码器靠池化索引 MaxUnpool 上采样
+    why: 对比同一模型在两种类别粒度下的分割难度
+    techs: [segnet]
+    evidence: [segnet-code, seg-report]
+  - what: 写了多策略类别权重计算脚本（中位频率、逆频率、有效样本数等）
+    why: CamVid 类别不均衡，需要能按频率给交叉熵加权
+    techs: [segnet]
+    evidence: [classweight-code]
+  - what: 用 nn.Transformer 搭中译英模型，配标签平滑、Noam 学习率和 n-gram 重复抑制的贪心解码
+    techs: [transformer, neural-machine-translation]
+    evidence: [nmt-code, nmt-report]
+  - what: 实现 LSTM 唐诗生成，解码用 Top-k 加温度采样
+    techs: [lstm-language-model]
+    evidence: [poetry-code]
+  - what: 在 CIFAR-10 上训练 ViT，配 AdamW、余弦退火与 AutoAugment
+    techs: [vision-transformer]
+    evidence: [vit-report]
+
+decisions:
+  - choice: 分割损失忽略 255 标签，并支持按类别频率加权
+    why: 无效区域不应产生梯度，类别不均衡时可选加权缓解
+    alternatives: [不加权的交叉熵]
+    evidence: [seg-loss-report]
+  - choice: 翻译训练以开发集 BLEU 作为早停和保存最佳检查点的依据
+    why: 报告里说明用开发集 BLEU 来衡量翻译质量并提升训练效率
+    evidence: [nmt-early-stop]
+
+findings:
+  - claim: CamVid-11 的 mIoU 远高于 CamVid-32，11 类任务更容易、类别更均衡
+    kind: insight
+    evidence: [seg-report-table]
+  - claim: 实验五的 YOLOv5 数据配置里 train 与 val 指向同一目录，其 mAP 不是留出集结果
+    kind: pitfall
+    evidence: [yolo-dataset, yolo-results]
+  - claim: 唐诗生成示例仍有用词赘余和重复（如“芙蓉”多次出现），受限于长程语义与词汇多样性
+    kind: negative
+    evidence: [poetry-report]
+  - claim: 实验八的实验报告仍是占位，未写正式结果
+    kind: negative
+    evidence: [eighth-report]
+
+metrics:
+  - name: CIFAR-10 最佳测试准确率
+    value: 90.82
+    unit: "%"
+    setting: ViT 7 层 8 头，训练 200 轮，CIFAR-10 官方测试集
+    scale: pilot
+    evidence: [vit-metric]
+  - name: 中译英开发集最佳 BLEU
+    value: 23.50
+    setting: NiuTrans 样例数据包，nn.Transformer，第 30 轮
+    scale: pilot
+    evidence: [nmt-bleu, nmt-json]
+  - name: CamVid-11 最佳 val mIoU
+    value: 56.44
+    unit: "%"
+    setting: SegNet，CamVid 11 类，val 集
+    scale: pilot
+    baseline: {value: 17.88, label: CamVid-32 同模型}
+    evidence: [seg-report-table]
+  - name: YOLOv5 末轮 mAP@0.5
+    value: 0.94657
+    setting: coco128，train 与 val 同目录，非留出集，100 轮
+    scale: smoke
+    evidence: [yolo-results, yolo-dataset]
+
+evidence:
+  - id: segnet-code
+    type: file
+    path: sixthExperience/src/models/segnet.py
+    quote: ["self.unpool = nn.ModuleList([nn.MaxUnpool2d(2, stride=2) for _ in decoder_channels])"]
+  - id: seg-report
+    type: file
+    path: sixthExperience/实验报告.md
+    quote: ["| CamVid-11 | 55.61% | 89.39% | 56.44% | 89.57% | 96 |"]
+  - id: seg-loss-report
+    type: file
+    path: sixthExperience/实验报告.md
+    quote: ["采用交叉熵损失，忽略像素标签中的 255 索引以规避无效区域对训练的干扰"]
+  - id: seg-report-table
+    type: file
+    path: sixthExperience/实验报告.md
+    quote:
+      - "| CamVid-11 | 55.61% | 89.39% | 56.44% | 89.57% | 96 |"
+      - "| CamVid-32 | 17.45% | 82.21% | 17.88% | 82.65% | 107 |"
+  - id: classweight-code
+    type: file
+    path: sixthExperience/tools/compute_class_weights.py
+    quote: ["1) median_freq  : median(freq_non_zero) / freq_i"]
+  - id: nmt-code
+    type: file
+    path: fourthExperience/main.py
+    quote: ["class NoamScheduler(torch.optim.lr_scheduler._LRScheduler):", "self.transformer = nn.Transformer("]
+  - id: nmt-report
+    type: file
+    path: fourthExperience/实验报告.md
+    quote: ["配合正弦位置编码、标签平滑的交叉熵损失、Adam 优化器与 Noam 学习率调度策略"]
+  - id: nmt-early-stop
+    type: file
+    path: fourthExperience/实验报告.md
+    quote: ["早停策略以开发集 BLEU 为指标，触发后保存最佳检查点"]
+  - id: nmt-bleu
+    type: file
+    path: fourthExperience/实验报告.md
+    quote: ["本次实验的开发集最佳 BLEU 为 23.50（step=22950，epoch=30）"]
+  - id: nmt-json
+    type: file
+    path: fourthExperience/figures/plots_summary.json
+    quote: ["\"best_bleu\": 23.498642774763134"]
+  - id: poetry-code
+    type: file
+    path: thirdExperience/main.py
+    quote: ["def generate(model, start_words, ix2word, word2ix, args):", "top_k_logits, top_k_indices = torch.topk(output, k)"]
+  - id: poetry-report
+    type: file
+    path: thirdExperience/实验报告.md
+    quote: ["个别句子仍存在用词赘余（如“间”重复、“芙蓉”多次出现）"]
+  - id: vit-report
+    type: file
+    path: secondExperience/实验报告.md
+    quote: ["优化器为 AdamW (lr=3e-4, weight_decay=0.05)", "启用 AutoAugment(CIFAR10 policy) 扩展图像变化空间"]
+  - id: vit-metric
+    type: file
+    path: secondExperience/实验报告.md
+    quote: ["| 最佳测试准确率 | 90.82% | 从 checkpoint 元信息读取 |"]
+  - id: yolo-dataset
+    type: file
+    path: fifthExperience/configs/dataset.yaml
+    quote: ["datasets/coco128/images/train2017", "nc: 80"]
+  - id: yolo-results
+    type: file
+    path: fifthExperience/runs/train/custom_yolov5s/results.csv
+    quote: ["0.94657"]
+  - id: eighth-report
+    type: file
+    path: eighthExperience/实验报告.md
+    quote: ["（此文件用于撰写正式实验报告，此处先占位，后续根据实验过程与结果补充。）"]
+
+links: {}
