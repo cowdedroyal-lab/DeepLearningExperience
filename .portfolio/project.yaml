@@ -5,7 +5,7 @@ title: 深度学习课程实验合集
 title_en: Deep learning course experiments
 kind: course
 role: solo
-status: done
+status: archived   # 已归档：学习记录，不进入简历生成
 period: {start: "2025-10", end: "2025-11"}
 visibility: hidden
 
