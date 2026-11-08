@@ -29,6 +29,14 @@
 - 实验七 `seventhExperience/`：PTB 上的 LSTM 语言模型，复用 PyTorch 官方 word_language_model 示例，并标注了复制来源。
 - 实验八 `eighthExperience/`：ResNet50 编码加 TransformerDecoder，COCO 2014，评估 BLEU、METEOR、ROUGE-L、CIDEr（简化实现）。
 
+以上代码均为本人所写；其中实验三参照课程 PDF 实现，实验七参照 PyTorch 官方 word_language_model 示例实现，实验五在官方 YOLOv5 之上写包装脚本。各实验对应的贡献、取舍与证据见 `.portfolio/project.yaml`：
+
+- 实验一：两层卷积 CNN，加混淆矩阵与误分类样本图导出脚本。
+- 实验二：ViT 训练改用 AdamW、AutoAugment 与 Dropout 0.2。
+- 实验五：YOLOv5 训练、评估、推理包装脚本与数据集检查脚本。
+- 实验七：自写数据下载脚本与 temperature/top-k/top-p 采样推理脚本。
+- 实验八：ResNet50 加 Transformer 解码器的图像描述模型，以及简化版 BLEU/METEOR/ROUGE-L/CIDEr 评测。
+
 ## 结果
 
 已提交文本文件里能核对的数字（完整清单见 `.portfolio/project.yaml` 的 metrics）：

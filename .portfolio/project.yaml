@@ -24,27 +24,21 @@ techs:
   - slug: convolutional-neural-network
     depth: used
     note: 实验一 MNIST，实验八 ResNet50 编码器
-    proposed: {name: Convolutional Neural Network, name_zh: 卷积神经网络, kind: model}
-  - slug: lstm-language-model
+  - slug: long-short-term-memory
     depth: used
     note: 实验三唐诗、实验七 PTB
-    proposed: {name: LSTM Language Model, name_zh: LSTM 语言模型, kind: model}
   - slug: neural-machine-translation
     depth: used
     note: 实验四中译英
-    proposed: {name: Neural Machine Translation, name_zh: 神经机器翻译, kind: application}
-  - slug: yolov5
+  - slug: yolo
     depth: touched
     note: 实验五，基于官方实现
-    proposed: {name: YOLOv5, name_zh: YOLOv5 目标检测, kind: model}
   - slug: segnet
     depth: used
     note: 实验六 CamVid
-    proposed: {name: SegNet, name_zh: SegNet 语义分割, kind: model}
   - slug: image-captioning
     depth: used
     note: 实验八 COCO
-    proposed: {name: Image Captioning, name_zh: 图像描述, kind: application}
 
 contributions:
   - what: 用 SegNet 在 CamVid 上做 11 类和 32 类语义分割，解码器靠池化索引 MaxUnpool 上采样
@@ -58,12 +52,24 @@ contributions:
   - what: 用 nn.Transformer 搭中译英模型，配标签平滑、Noam 学习率和 n-gram 重复抑制的贪心解码
     techs: [transformer, neural-machine-translation]
     evidence: [nmt-code, nmt-report]
-  - what: 实现 LSTM 唐诗生成，解码用 Top-k 加温度采样
-    techs: [lstm-language-model]
-    evidence: [poetry-code]
+  - what: 参照课程 PDF 实现 LSTM 唐诗生成，配 ReduceLROnPlateau、梯度裁剪，Top-k 加温度采样
+    techs: [long-short-term-memory]
+    evidence: [poetry-code, poetry-train, poetry-readme]
   - what: 在 CIFAR-10 上训练 ViT，配 AdamW、余弦退火与 AutoAugment
     techs: [vision-transformer]
-    evidence: [vit-report]
+    evidence: [vit-report, vit-code]
+  - what: 实现两层 5×5 卷积的 MNIST 分类 CNN，并写脚本导出混淆矩阵与误分类样本图
+    techs: [convolutional-neural-network]
+    evidence: [mnist-cnn-code, mnist-tools]
+  - what: 写 YOLOv5 训练、评估、推理包装脚本和 YOLO 数据集合法性检查脚本，底层用官方实现
+    techs: [yolo]
+    evidence: [yolo-wrapper, yolo-verify, yolo-readme]
+  - what: 参照 PyTorch word_language_model 示例实现 PTB LSTM 语言模型，自写数据下载与采样推理脚本
+    techs: [long-short-term-memory]
+    evidence: [ptb-readme, ptb-sampling, ptb-download]
+  - what: 实现 ResNet50 加 Transformer 解码器的图像描述模型与简化版 BLEU/METEOR/ROUGE-L/CIDEr 评测
+    techs: [image-captioning, transformer, convolutional-neural-network]
+    evidence: [cap-model, cap-metrics, cap-readme]
 
 decisions:
   - choice: 分割损失忽略 255 标签，并支持按类别频率加权
@@ -73,6 +79,12 @@ decisions:
   - choice: 翻译训练以开发集 BLEU 作为早停和保存最佳检查点的依据
     why: 报告里说明用开发集 BLEU 来衡量翻译质量并提升训练效率
     evidence: [nmt-early-stop]
+  - choice: ViT 训练改用 AdamW、权重衰减 0.05，并加 AutoAugment 与 Dropout 0.2
+    why: 代码注释称 AdamW 对 Transformer 通常更好，加深后的模型需要更强增强和正则
+    evidence: [vit-adamw, vit-autoaug, vit-dropout]
+  - choice: 推理默认跳过 <unk>，把 <eos> 渲染为换行
+    why: README 说明这样生成的文本输出更自然
+    evidence: [ptb-infer-readme, ptb-unk-code]
 
 findings:
   - claim: CamVid-11 的 mIoU 远高于 CamVid-32，11 类任务更容易、类别更均衡
@@ -184,5 +196,81 @@ evidence:
     type: file
     path: eighthExperience/实验报告.md
     quote: ["（此文件用于撰写正式实验报告，此处先占位，后续根据实验过程与结果补充。）"]
+  - id: poetry-train
+    type: file
+    path: thirdExperience/main.py
+    quote: ["scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min',", "grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)"]
+  - id: poetry-readme
+    type: file
+    path: thirdExperience/README.md
+    quote: ["代码结构和逻辑参考了 PDF"]
+  - id: vit-code
+    type: file
+    path: secondExperience/train_vit_cifar10.py
+    quote: ["class ViT(nn.Module):"]
+  - id: vit-adamw
+    type: file
+    path: secondExperience/train_vit_cifar10.py
+    quote: ["# 【MODIFIED】改用 AdamW 优化器，它通常在Transformer上表现更好", "optimizer = optim.AdamW(net.parameters(), lr=args.lr, weight_decay=args.weight_decay)"]
+  - id: vit-autoaug
+    type: file
+    path: secondExperience/train_vit_cifar10.py
+    quote: ["# 【MODIFIED】启用AutoAugment以实现更强的数据增强"]
+  - id: vit-dropout
+    type: file
+    path: secondExperience/train_vit_cifar10.py
+    quote: ["# 【MODIFIED】增加Dropout率以匹配更深的模型，防止过拟合"]
+  - id: mnist-cnn-code
+    type: file
+    path: firstExperience/train_mnist.py
+    quote: ["self.out = nn.Linear(32 * 7 * 7, 10)", "optimizer = optim.Adam(model.parameters(), lr=args.lr)"]
+  - id: mnist-tools
+    type: file
+    path: firstExperience/tools/export_confusion_matrix.py
+    quote: ["def compute_confusion_matrix("]
+  - id: yolo-wrapper
+    type: file
+    path: fifthExperience/train.py
+    quote: ["def build_train_cmd(cfg: dict, allow_missing: bool = False) -> list:"]
+  - id: yolo-verify
+    type: file
+    path: fifthExperience/tools/verify_yolo_dataset.py
+    quote: ["def check_label_file(label_p: Path, nc: int, max_lines: int = 3)"]
+  - id: yolo-readme
+    type: file
+    path: fifthExperience/README.md
+    quote: ["我们采用官方教程与代码，外加本仓库提供的一组包装脚本"]
+  - id: ptb-readme
+    type: file
+    path: seventhExperience/README.md
+    quote: ["实现严格参考并复用 PyTorch 官方 examples 的 word_language_model 代码"]
+  - id: ptb-infer-readme
+    type: file
+    path: seventhExperience/README.md
+    quote: ["默认跳过 `<unk>`，将 `<eos>` 渲染为换行"]
+  - id: ptb-unk-code
+    type: file
+    path: seventhExperience/inference.py
+    quote: ["if not args.keep_unk and unk_idx is not None and 0 <= unk_idx < weights.numel():"]
+  - id: ptb-sampling
+    type: file
+    path: seventhExperience/inference.py
+    quote: ["def apply_sampling_filters(weights: torch.Tensor) -> torch.Tensor:"]
+  - id: ptb-download
+    type: file
+    path: seventhExperience/tools/download_ptb.py
+    quote: ["PTB_URL = 'http://www.fit.vutbr.cz/~imikolov/rnnlm/simple-examples.tgz'"]
+  - id: cap-model
+    type: file
+    path: eighthExperience/src/models/transformer_decoder.py
+    quote: ["class CaptionTransformer(nn.Module):"]
+  - id: cap-metrics
+    type: file
+    path: eighthExperience/src/utils/metrics.py
+    quote: ["def compute_cider(", "def compute_corpus_metrics("]
+  - id: cap-readme
+    type: file
+    path: eighthExperience/README.md
+    quote: ["本工程实现了一个基于 ResNet50 + TransformerDecoder 的图像描述系统"]
 
 links: {}
